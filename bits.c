@@ -158,7 +158,7 @@ int signMask(void) {
  *   Rating: 2
  */
 int bitXor(int x, int y) {
-	return 2;
+	return (~((~x)&y))&(~(x&(~y)));
 }
 
 // P3
