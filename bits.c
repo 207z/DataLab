@@ -382,7 +382,7 @@ int mul5Sat(int x) {
  */
 int classifyAdd3(int x, int y, int z) {
   int different_signs_x_y = ((x ^ y) >> 31) & 1;
-  int mask = different_signs_x_y;
+  int mask = !different_signs_x_y;
   mask = mask | (mask << 1);
   mask = mask | (mask << 2);
   mask = mask | (mask << 4); 
