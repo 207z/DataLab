@@ -251,14 +251,13 @@ int secondLowestZeroBit(int x) {
  *   Rating: 5
  */
 int oddParity(int x) {
-  x = x << 1;
   x = ((x & 0x0000FFFF) << 16) ^ (x & 0xFFFF0000);
   x = ((x & 0x00FF0000) << 8) ^ (x & 0xFF000000);
   x = ((x & 0x0F000000) << 4) ^ (x & 0xF0000000);
   x = ((x & 0x30000000) << 2) ^ (x & 0xC0000000);
   x = ((x & 0x40000000) << 1) ^ (x & 0x80000000);
   x = x >> 31;
-  return x & 1;
+  return (~x) & 1;
 }
 
 // P9
