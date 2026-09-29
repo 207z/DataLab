@@ -352,7 +352,22 @@ int isBetweenEitherOrder(int x, int a, int b) {
  *   Rating: 7
  */
 int mul5Sat(int x) {
-  return 13;
+  int is_negative = (x >> 31) & 1;
+  int INT_MAX = 0x7FFFFFFF;
+  int not_overflow = 1;
+  int x_times_2 = x << 1;
+  not_overflow = not_overflow & ((x_times_2 & x) >> 31) ;
+  int x_times_4 = x_times_2 << 1;
+  not_overflow = not_overflow & ((x_times_4 & x) >> 31) ;
+  int x_times_5 = x_times_4 + x;
+  not_overflow = not_overflow & ((x_times_5 & x) >> 31) ;
+  INT_MAX = (INT_MAX + (is_negative | not_overflow)) << not_overflow;
+  not_overflow = not_overflow | (not_overflow << 1);
+  not_overflow = not_overflow | (not_overflow << 2);
+  not_overflow = not_overflow | (not_overflow << 4);
+  not_overflow = not_overflow | (not_overflow << 8);
+  not_overflow = not_overflow | (not_overflow << 16);
+  return (x_times_5 & not_overflow) | INT_MAX ;
 }
 
 // P14
