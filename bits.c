@@ -185,7 +185,11 @@ int negativePart(int x){
  *   Rating: 4
  */
 int copyByteWithin(int x, int src, int dst) {
-  return 4;
+  dst = dst << 3;
+  src = src << 3;
+  int x_dst = (x & ( 0xFFFFFFFF ^ (0xFF << dst)));
+  int x_src = (((x & (0xFF << src)) >> src) & 0xFF) << dst;
+  return x_dst | x_src;
 }
 
 // P5
@@ -198,7 +202,10 @@ int copyByteWithin(int x, int src, int dst) {
  *   Rating: 4
  */
 int logicalShift(int x, int n) {
-  return 5;
+  x = x >> n;
+  int mask = ~(((1 << 31) >> n) << 1);
+  x = x & mask;
+  return x;
 }
 
 // P6
@@ -210,7 +217,12 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int swapNibblePairs(int x) {
-  return 6;
+  int low_nibble = x & 0x0F0F0F0F;
+  int high_nibble = x & 0xF0F0F0F0;
+  low_nibble = low_nibble << 4;
+  high_nibble = high_nibble >> 4;
+  high_nibble = high_nibble & 0x0FFFFFFF;
+  return low_nibble | high_nibble;
 }
 
 // P7
@@ -223,7 +235,10 @@ int swapNibblePairs(int x) {
  *   Rating: 4
  */
 int secondLowestZeroBit(int x) {
-  return 7;
+  x = x | (x + 1);
+  int x_plus_1 = x + 1;
+  int second_lowest_zero_bit = x_plus_1 & (~x);
+  return second_lowest_zero_bit;
 }
 
 // P8
@@ -236,7 +251,13 @@ int secondLowestZeroBit(int x) {
  *   Rating: 5
  */
 int oddParity(int x) {
-  return 8;
+  x = ((x & 0x0000FFFF) << 16) ^ (x & 0xFFFF0000);
+  x = ((x & 0x00FF0000) << 8) ^ (x & 0xFF000000);
+  x = ((x & 0x0F000000) << 4) ^ (x & 0xF0000000);
+  x = ((x & 0x30000000) << 2) ^ (x & 0xC0000000);
+  x = ((x & 0x40000000) << 1) ^ (x & 0x80000000);
+  x = x >> 31;
+  return x & 1;
 }
 
 // P9
@@ -249,7 +270,9 @@ int oddParity(int x) {
  *   Rating: 5
  */
 int rotateRightBits(int x, int n) {
-  return 9;
+  int mask = ~(((1 << 31) >> n) << 1);
+  x = ((x >> n) & mask) | (x << ((31 ^ n) + 1));
+  return x;
 }
 
 // P10
