@@ -288,12 +288,12 @@ int rotateRightBits(int x, int n) {
  */
 int roundEvenPow2(int x, int n) {
   int n_minus_1 = ((n ^ 31) + 1);
-  int exactly_halfway = !(!(x << (n_minus_1 + 1)));
+  int exactly_halfway = !(!((x << n_minus_1) << 1));
   n_minus_1 = n_minus_1 ^ 31;
   x = x >> n_minus_1;
   int round_up = x & 1;
   x = x >> 1;
-  x = x + round_up & ((x & 1) | exactly_halfway);
+  x = x + (round_up & ((x & 1) | exactly_halfway));
   x = x << n;
   return x;
 }
