@@ -391,6 +391,7 @@ int classifyAdd3(int x, int y, int z) {
   y = y ^ (z & mask);
   z = z ^ (y & mask);
   y = y ^ (z & mask);
+  different_signs_x_y = ((x ^ y) >> 31) & 1;
   int not_overflow = 1;
   int opposite_x = ~x;
   int x_plus_y = x + y;
