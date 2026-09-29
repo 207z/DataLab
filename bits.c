@@ -314,7 +314,7 @@ int midpointTowardFirst(int x, int y) {
   int x_xor_y = x ^ y;
   int mid_point = (x & y) + (x_xor_y >> 1);
   y = y ^ 0xFFFFFFFF;
-  int x_greater_than_y = !(!(((x >> 1) + (y >> 1) + (x & y & 1)) & 0x80000000));
+  int x_greater_than_y = (!(!(((x >> 1) + (y >> 1) + (x & y & 1)) & 0x80000000))) | (((x_xor_y >> 31) & 1) & ((~x) >> 31));
   mid_point = mid_point + (x_xor_y & 1 & x_greater_than_y);
   return mid_point;
 }
