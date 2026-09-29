@@ -381,7 +381,21 @@ int mul5Sat(int x) {
  *   Rating: 7
  */
 int classifyAdd3(int x, int y, int z) {
-  return 14;
+  int not_overflow = 1;
+  int opposite_x = ~x;
+  int different_signs_x_y = ((x ^ y) >> 31) & 1;
+  int x_plus_y = x + y;
+  int is_negative = (x >> 31) & 1;
+  int is_positive = !is_negative;
+  not_overflow = not_overflow & ((((x_plus_y ^ opposite_x) >> 31) & 1) | different_signs_x_y);
+  x = x_plus_y;
+  opposite_x = ~x;
+  int different_signs_x_z = ((x ^ z) >> 31) & 1;
+  int x_plus_z = x + z;
+  is_negative = (not_overflow & ((x >> 31) & 1)) | (is_negative & (!not_overflow));
+  is_positive = !is_negative;
+  not_overflow = not_overflow & ((((x_plus_z ^ opposite_x) >> 31) & 1) | different_signs_x_z);
+  return is_positive + (~is_negative) + 1;
 }
 
 // P15
