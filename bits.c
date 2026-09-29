@@ -381,9 +381,18 @@ int mul5Sat(int x) {
  *   Rating: 7
  */
 int classifyAdd3(int x, int y, int z) {
+  int different_signs_x_y = ((x ^ y) >> 31) & 1;
+  int mask = different_signs_x_y;
+  mask = mask | (mask << 1);
+  mask = mask | (mask << 2);
+  mask = mask | (mask << 4); 
+  mask = mask | (mask << 8);
+  mask = mask | (mask << 16);
+  y = y ^ (z & mask);
+  z = z ^ (y & mask);
+  y = y ^ (z & mask);
   int not_overflow = 1;
   int opposite_x = ~x;
-  int different_signs_x_y = ((x ^ y) >> 31) & 1;
   int x_plus_y = x + y;
   int is_negative = (x >> 31) & 1;
   int is_positive = !is_negative;
