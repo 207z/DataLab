@@ -395,6 +395,8 @@ int classifyAdd3(int x, int y, int z) {
   is_negative = (not_overflow & ((x >> 31) & 1)) | (is_negative & (!not_overflow));
   is_positive = !is_negative;
   not_overflow = not_overflow & ((((x_plus_z ^ opposite_x) >> 31) & 1) | different_signs_x_z);
+  is_negative = is_negative & (~not_overflow);
+  is_positive = is_positive & (~not_overflow);
   return is_positive + (~is_negative) + 1;
 }
 
