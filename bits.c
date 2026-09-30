@@ -424,8 +424,16 @@ int classifyAdd3(int x, int y, int z) {
  *   Rating: 7
  */
 unsigned floatScaleThreeHalves(unsigned uf) {
-
-  return 15;
+  int val = uf & 0x007FFFFF;
+  val = val + (val >> 1);
+  if (val > 0x007FFFFF) {
+    val = val >> 1;
+    uf = (uf & 0xFF800000) + 0x00800000 + val;
+  }
+  else{
+    uf = (uf & 0xFF800000) + val;
+  }
+  return uf;
 }
 
 // P16
