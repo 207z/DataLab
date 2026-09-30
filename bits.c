@@ -427,6 +427,9 @@ unsigned floatScaleThreeHalves(unsigned uf) {
   if(uf == 0){
     return 0;
   }
+  if(uf == 0x80000000){
+    return 0x80000000;
+  }
   int val = (uf & 0x007FFFFF) + 0x00800000;
   val = val + (val >> 1);
   if (val > 0x00FFFFFF) {
