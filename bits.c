@@ -430,7 +430,7 @@ unsigned floatScaleThreeHalves(unsigned uf) {
     val = val + (val >> 1);
     val = val + (val & mask);
     if (val & 0x00800000) {
-      return NaN;
+      return (uf & 0x80000000) + 0x00800000;
     }
     else{
       return (uf & 0xFF800000) + val;      
