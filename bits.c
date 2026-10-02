@@ -225,7 +225,7 @@ int swapNibblePairs(int x) {
   int high_nibble = x & mask_shifted;
   low_nibble = low_nibble << 4;
   high_nibble = high_nibble >> 4;
-  high_nibble = high_nibble & (mask | mask_shifted);
+  high_nibble = high_nibble & (mask | (mask >> 4));
   return low_nibble | high_nibble;
 }
 
@@ -333,7 +333,7 @@ int midpointTowardFirst(int x, int y) {
   mask = mask | (mask << 16);
   y = y ^ mask;
   int mask_top = 0x80 << 24;
-  mask = mask | mask_top;
+  mask = mask ^ mask_top;
   int different_signs = (x_xor_y >> 31) & 1;
   int x_greater_than_y = ((!(!((((x >> 1) & mask) + ((y >> 1) & mask) + (x & y & 1)) & mask_top))) & (!different_signs)) | (different_signs & ((~x) >> 31));
   mid_point = mid_point + (x_xor_y & 1 & x_greater_than_y);
@@ -359,7 +359,7 @@ int isBetweenEitherOrder(int x, int a, int b) {
   a = a ^ mask;
   b = b ^ mask;
   int mask_top = 0x80 << 24;
-  mask = mask | mask_top;
+  mask = mask ^ mask_top;
   int different_signs_x_a = (x_xor_a >> 31) & 1;
   int different_signs_x_b = (x_xor_b >> 31) & 1;
   int x_greater_than_a = ((!(!((((x >> 1) & mask) + ((a >> 1) & mask) + (x & a & 1)) & mask_top))) & (!different_signs_x_a)) | (different_signs_x_a & ((~x) >> 31));
