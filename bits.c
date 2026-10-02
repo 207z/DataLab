@@ -187,7 +187,7 @@ int negativePart(int x){
 int copyByteWithin(int x, int src, int dst) {
   dst = dst << 3;
   src = src << 3;
-  int x_dst = (x & ( 0xFFFFFFFF ^ (0xFF << dst)));
+  int x_dst = (x & (~(0xFF << dst)));
   int x_src = (((x & (0xFF << src)) >> src) & 0xFF) << dst;
   return x_dst | x_src;
 }
