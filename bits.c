@@ -146,7 +146,7 @@ NOTES:
  *   Rating: 1
  */
 int signMask(void) {
-  return 0x80000000;
+  return (0x80) << 24;
 }
 
 // P2
@@ -217,11 +217,15 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int swapNibblePairs(int x) {
-  int low_nibble = x & 0x0F0F0F0F;
-  int high_nibble = x & 0xF0F0F0F0;
+  int mask = 0xF;
+  mask = mask | (mask << 8);
+  mask = mask | (mask << 16);
+  int low_nibble = x & mask;
+  int mask_shifted = mask << 4;
+  int high_nibble = x & mask_shifted;
   low_nibble = low_nibble << 4;
   high_nibble = high_nibble >> 4;
-  high_nibble = high_nibble & 0x0FFFFFFF;
+  high_nibble = high_nibble & (mask | mask_shifted);
   return low_nibble | high_nibble;
 }
 
@@ -251,11 +255,22 @@ int secondLowestZeroBit(int x) {
  *   Rating: 5
  */
 int oddParity(int x) {
-  x = ((x & 0x0000FFFF) << 16) ^ (x & 0xFFFF0000);
-  x = ((x & 0x00FF0000) << 8) ^ (x & 0xFF000000);
-  x = ((x & 0x0F000000) << 4) ^ (x & 0xF0000000);
-  x = ((x & 0x30000000) << 2) ^ (x & 0xC0000000);
-  x = ((x & 0x40000000) << 1) ^ (x & 0x80000000);
+  int mask = 0xFF;
+  mask = mask | (mask << 8);
+  int mask_shifted = mask << 16;
+  x = ((x & mask) << 16) ^ (x & mask_shifted);
+  mask = (0xFF) << 16;
+  mask_shifted = mask << 8;
+  x = ((x & mask) << 8) ^ (x & mask_shifted);
+  mask = (0xF) << 24;
+  mask_shifted = mask << 4;
+  x = ((x & mask) << 4) ^ (x & mask_shifted);
+  mask = (0x3) << 28;
+  mask_shifted = mask << 2;
+  x = ((x & mask) << 2) ^ (x & mask_shifted);
+  mask = (0x4) << 28;
+  mask_shifted = mask << 1;
+  x = ((x & mask) << 1) ^ (x & mask_shifted);
   x = x >> 31;
   return (~x) & 1;
 }
@@ -313,9 +328,14 @@ int roundEvenPow2(int x, int n) {
 int midpointTowardFirst(int x, int y) {
   int x_xor_y = x ^ y;
   int mid_point = (x & y) + (x_xor_y >> 1);
-  y = y ^ 0xFFFFFFFF;
+  int mask = 0xFF;
+  mask = mask | (mask << 8);
+  mask = mask | (mask << 16);
+  y = y ^ mask;
+  int mask_top = 0x80 << 24;
+  mask = mask | mask_top;
   int different_signs = (x_xor_y >> 31) & 1;
-  int x_greater_than_y = ((!(!((((x >> 1) & 0x7FFFFFFF) + ((y >> 1) & 0x7FFFFFFF) + (x & y & 1)) & 0x80000000))) & (!different_signs)) | (different_signs & ((~x) >> 31));
+  int x_greater_than_y = ((!(!((((x >> 1) & mask) + ((y >> 1) & mask) + (x & y & 1)) & mask_top))) & (!different_signs)) | (different_signs & ((~x) >> 31));
   mid_point = mid_point + (x_xor_y & 1 & x_greater_than_y);
   return mid_point;
 }
@@ -333,12 +353,17 @@ int midpointTowardFirst(int x, int y) {
 int isBetweenEitherOrder(int x, int a, int b) {
   int x_xor_a = x ^ a;
   int x_xor_b = x ^ b;
-  a = a ^ 0xFFFFFFFF;
-  b = b ^ 0xFFFFFFFF;
+  int mask = 0xFF;
+  mask = mask | (mask << 8);
+  mask = mask | (mask << 16);
+  a = a ^ mask;
+  b = b ^ mask;
+  int mask_top = 0x80 << 24;
+  mask = mask | mask_top;
   int different_signs_x_a = (x_xor_a >> 31) & 1;
   int different_signs_x_b = (x_xor_b >> 31) & 1;
-  int x_greater_than_a = ((!(!((((x >> 1) & 0x7FFFFFFF) + ((a >> 1) & 0x7FFFFFFF) + (x & a & 1)) & 0x80000000))) & (!different_signs_x_a)) | (different_signs_x_a & ((~x) >> 31));
-  int x_greater_than_b = ((!(!((((x >> 1) & 0x7FFFFFFF) + ((b >> 1) & 0x7FFFFFFF) + (x & b & 1)) & 0x80000000))) & (!different_signs_x_b)) | (different_signs_x_b & ((~x) >> 31));
+  int x_greater_than_a = ((!(!((((x >> 1) & mask) + ((a >> 1) & mask) + (x & a & 1)) & mask_top))) & (!different_signs_x_a)) | (different_signs_x_a & ((~x) >> 31));
+  int x_greater_than_b = ((!(!((((x >> 1) & mask) + ((b >> 1) & mask) + (x & b & 1)) & mask_top))) & (!different_signs_x_b)) | (different_signs_x_b & ((~x) >> 31));
   return (x_greater_than_a ^ x_greater_than_b) | (!x_xor_a) | (!x_xor_b);
 }
 
@@ -354,7 +379,8 @@ int isBetweenEitherOrder(int x, int a, int b) {
 int mul5Sat(int x) {
   int opposite_x = ~x;
   int is_negative = (x >> 31) & 1;
-  int INT_MAX = 0x7FFFFFFF;
+  int mask = 1 << 31;
+  int INT_MAX = ~mask;
   int not_overflow = 1;
   int x_times_2 = x << 1;
   not_overflow = not_overflow & ((x_times_2 ^ opposite_x) >> 31) ;
@@ -363,11 +389,8 @@ int mul5Sat(int x) {
   int x_times_5 = x_times_4 + x;
   not_overflow = not_overflow & ((x_times_5 ^ opposite_x) >> 31) ;
   INT_MAX = (INT_MAX + (is_negative | not_overflow)) << not_overflow;
-  not_overflow = not_overflow | (not_overflow << 1);
-  not_overflow = not_overflow | (not_overflow << 2);
-  not_overflow = not_overflow | (not_overflow << 4);
-  not_overflow = not_overflow | (not_overflow << 8);
-  not_overflow = not_overflow | (not_overflow << 16);
+  not_overflow = not_overflow << 31;
+  not_overflow = not_overflow >> 31;
   return (x_times_5 & not_overflow) | INT_MAX ;
 }
 
@@ -495,20 +518,33 @@ unsigned float_i2f(int x) {
  *   Rating: 10
  */
 int bitCount(int x) {
-  int lower_x = x & 0x55555555;
-  int higher_x = (x >> 1) & 0x55555555;
+  int mask = 0x55;
+  mask = mask | (mask << 8);
+  mask = mask | (mask << 16);
+  int lower_x = x & mask;
+  int higher_x = (x >> 1) & mask;
   x = lower_x + higher_x;
-  lower_x = x & 0x33333333;
-  higher_x = (x >> 2) & 0x33333333;
+  mask = 0x33;
+  mask = mask | (mask << 8);
+  mask = mask | (mask << 16);
+  lower_x = x & mask;
+  higher_x = (x >> 2) & mask;
   x = lower_x + higher_x;
-  lower_x = x & 0x0F0F0F0F;
-  higher_x = (x >> 4) & 0x0F0F0F0F;
+  mask = 0xF;
+  mask = mask | (mask << 8);
+  mask = mask | (mask << 16);
+  lower_x = x & mask;
+  higher_x = (x >> 4) & mask;
   x = lower_x + higher_x;
-  lower_x = x & 0x00FF00FF;
-  higher_x = (x >> 8) & 0x00FF00FF;
+  mask = 0xFF;
+  mask = mask | (mask << 16);
+  lower_x = x & mask;
+  higher_x = (x >> 8) & mask;
   x = lower_x + higher_x;
-  lower_x = x & 0x0000FFFF;
-  higher_x = (x >> 16) & 0x0000FFFF;
+  mask = 0xFF;
+  mask = mask | (mask << 8);
+  lower_x = x & mask;
+  higher_x = (x >> 16) & mask;
   x = lower_x + higher_x;
   return x;
 }
@@ -524,10 +560,16 @@ int bitCount(int x) {
  */
 int bitReverse(int x)
 {
-  x = ((x & 0x55555555) << 1) | ((x >> 1) & 0x55555555);
-  x = ((x & 0x33333333) << 2) | ((x >> 2) & 0x33333333);
-  x = ((x & 0x0F0F0F0F) << 4) | ((x >> 4) & 0x0F0F0F0F);
-  x = ((x & 0x00FF00FF) << 8) | ((x >> 8) & 0x00FF00FF);
-  x = ((x & 0x0000FFFF) << 16) | ((x >> 16) & 0x0000FFFF);
+  int mask = 0xFF;
+  mask = mask | (mask << 8);
+  x = (x << 16) | ((x >> 16) & mask);
+  mask = mask ^ (mask << 8);
+  x = ((x & mask) << 8) | ((x >> 8) & mask);
+  mask = mask ^ (mask << 4);
+  x = ((x & mask) << 4) | ((x >> 4) & mask);
+  mask = mask ^ (mask << 2);
+  x = ((x & mask) << 2) | ((x >> 2) & mask);
+  mask = mask ^ (mask << 1);
+  x = ((x & mask) << 1) | ((x >> 1) & mask);
   return x;
 }
