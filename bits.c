@@ -532,7 +532,7 @@ unsigned floatRoundEven(unsigned uf) {
     val = higher_val;
   }
   else{
-    val = (higher_val >> 1) << 1;
+    val = (higher_val >> (mask + 1)) << (mask + 1);
   }
   val = val - 0x00800000;
   val = val + (uf & 0xFF800000);
