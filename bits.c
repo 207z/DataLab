@@ -458,10 +458,16 @@ unsigned floatScaleThreeHalves(unsigned uf) {
   int mask = val & 0x00000001;
   val = val + (val >> 1);
   if (val & 0x01000000) {
-    mask = val & 0x00000001;
+    mask = ((val & 0x00000001) << 1) + mask;
     val = val >> 1;
     val = val ^ 0x00800000;
-    val = val + (val & mask);
+    if(mask == 3){
+      val = val + 1;
+    }
+    if(mask == 2){
+      mask = 1;
+      val = val + (val & mask);
+    }
     uf = (uf & 0xFF800000) + 0x00800000 + val;
   }
   else{
