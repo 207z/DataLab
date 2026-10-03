@@ -550,7 +550,29 @@ unsigned floatRoundEven(unsigned uf) {
  *   Rating: 10
  */
 unsigned float_i2f(int x) {
-  return 17;
+  int mask = 0;
+  int val = x;
+  if(x & 0x80000000){
+    mask = 0x80000000;
+    x = ~x + 1;
+  }
+  if(x == 0){
+    return mask;
+  }
+  int exp = 0;
+  while(x ^ 1){
+    x = x >> 1;
+    exp = exp + 1;
+  }
+  val = val - (1 << exp);
+  if(exp <= 23){
+    val = val << (23 - exp);
+  }
+  else{
+    val = val >> (exp - 23);
+  }
+  exp = exp + 127;
+  return mask + (exp << 23) + val;
 }
 
 
