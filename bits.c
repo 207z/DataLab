@@ -569,6 +569,14 @@ unsigned float_i2f(int x) {
     val = val << (23 - exp);
   }
   else{
+    if(val & (1 << (exp - 24))){
+      if(val & ((1 << (exp - 24)) -1)){
+        val = val + (1 << (exp - 24));
+      }
+      else{
+        val = val + (val & (1 << (exp - 23)));
+      }
+    }
     val = val >> (exp - 23);
   }
   exp = exp + 127;
