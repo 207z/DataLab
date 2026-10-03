@@ -450,7 +450,6 @@ unsigned floatScaleThreeHalves(unsigned uf) {
   if((uf & 0x7F800000) == 0x7F800000){
     return uf;
   }
-  int original_uf = uf;
   if(!(uf & 0x7F800000)) {
     int val = uf & 0x007FFFFF;
     int mask = val & 0x00000001;
@@ -479,8 +478,8 @@ unsigned floatScaleThreeHalves(unsigned uf) {
     val = val + (val & mask);
     uf = (uf & 0xFF800000) + val;
   }
-  if((uf & 0x7F800000) == 0x7F800000 && (uf & 0x007FFFFF) != 0){
-    return original_uf;
+  if((uf & 0x7F800000) == 0x7F800000){
+    return uf & 0xFF800000;
   }
   return uf;
 }
