@@ -551,7 +551,6 @@ unsigned floatRoundEven(unsigned uf) {
  */
 unsigned float_i2f(int x) {
   int mask = 0;
-  int val = x;
   if(x & 0x80000000){
     mask = 0x80000000;
     x = (~x) + 1;
@@ -560,6 +559,7 @@ unsigned float_i2f(int x) {
     return mask;
   }
   int exp = -1;
+  int val = x;
   while(x && exp < 31){
     x = x >> 1;
     exp = exp + 1;
