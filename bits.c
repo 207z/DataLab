@@ -554,7 +554,7 @@ unsigned float_i2f(int x) {
   int val = x;
   if(x & 0x80000000){
     mask = 0x80000000;
-    x = ~x + 1;
+    x = (~x) + 1;
   }
   if(x == 0){
     return mask;
