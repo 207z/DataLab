@@ -497,7 +497,56 @@ unsigned floatScaleThreeHalves(unsigned uf) {
  *   Rating: 10
  */
 unsigned floatRoundEven(unsigned uf) {
-  return 16;
+  if((uf & 0x7F800000) == 0x7F800000){
+    return uf;
+  }
+  int mask = (uf & 0x7F800000) >> 23;
+  if(mask < 126){
+    return 0;
+  }
+  if(mask == 126){
+    if(uf & 0x007FFFFF){
+      return 0;
+    }
+    if(uf & 0x80000000){
+      return 0xFFFFFFFF;
+    }
+    else{
+      return 1;
+    }
+  }
+  if(mask > 157){
+    if((uf & 0x80000000) == 0x80000000){
+      return 0x80000000;
+    }
+    return 0x7FFFFFFF;
+  }
+  int val = (uf & 0x007FFFFF) + 0x00800000;
+  mask = mask - 127;
+  if(mask < 23){
+    mask = 23 - mask;
+    int lower_val = val >> mask;
+    int higher_val = (val >> mask) + 1;
+    lower_val = lower_val << mask;
+    higher_val = higher_val << mask;
+    if(val - lower_val < higher_val - val){
+      val = lower_val;
+    }
+    else if(val - lower_val > higher_val - val){
+      val = higher_val;
+    }
+    else{
+      val = (higher_val >> 1) << 1;
+    }
+  }
+  else{
+    mask = mask - 23;
+    val = val << mask;
+  }
+  if(uf & 0x80000000){
+    val = ~val + 1;
+  }
+  return val;
 }
 
 // P17
