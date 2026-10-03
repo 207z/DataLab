@@ -559,8 +559,8 @@ unsigned float_i2f(int x) {
   if(x == 0){
     return mask;
   }
-  int exp = 0;
-  while(x ^ 1){
+  int exp = -1;
+  while(x && exp < 31){
     x = x >> 1;
     exp = exp + 1;
   }
