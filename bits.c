@@ -506,46 +506,36 @@ unsigned floatRoundEven(unsigned uf) {
   }
   if(mask == 126){
     if(uf & 0x007FFFFF){
-      return 0;
+      return uf & 0x80000000;
     }
     if(uf & 0x80000000){
-      return 0xFFFFFFFF;
+      return 0xBF800000;
     }
     else{
-      return 1;
+      return 0x3F800000;
     }
   }
-  if(mask > 157){
-    if((uf & 0x80000000) == 0x80000000){
-      return 0x80000000;
-    }
-    return 0x7FFFFFFF;
+  if(mask >= 150){
+    return uf;
   }
   int val = (uf & 0x007FFFFF) + 0x00800000;
   mask = mask - 127;
-  if(mask < 23){
-    mask = 23 - mask;
-    int lower_val = val >> mask;
-    int higher_val = (val >> mask) + 1;
-    lower_val = lower_val << mask;
-    higher_val = higher_val << mask;
-    if(val - lower_val < higher_val - val){
-      val = lower_val;
-    }
-    else if(val - lower_val > higher_val - val){
-      val = higher_val;
-    }
-    else{
-      val = (higher_val >> 1) << 1;
-    }
+  mask = 23 - mask;
+  int lower_val = val >> mask;
+  int higher_val = (val >> mask) + 1;
+  lower_val = lower_val << mask;
+  higher_val = higher_val << mask;
+  if(val - lower_val < higher_val - val){
+    val = lower_val;
+  }
+  else if(val - lower_val > higher_val - val){
+    val = higher_val;
   }
   else{
-    mask = mask - 23;
-    val = val << mask;
+    val = (higher_val >> 1) << 1;
   }
-  if(uf & 0x80000000){
-    val = ~val + 1;
-  }
+  val = val - 0x00800000;
+  val = val + (uf & 0xFF800000);
   return val;
 }
 
