@@ -505,7 +505,7 @@ unsigned floatRoundEven(unsigned uf) {
     return uf & 0x80000000;
   }
   if(mask == 126){
-    if(uf & 0x007FFFFF){
+    if((uf & 0x007FFFFF) == 0){
       return uf & 0x80000000;
     }
     if(uf & 0x80000000){
