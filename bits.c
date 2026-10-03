@@ -447,7 +447,7 @@ int classifyAdd3(int x, int y, int z) {
  *   Rating: 7
  */
 unsigned floatScaleThreeHalves(unsigned uf) {
-  if(uf & 0x7F800000 == 0x7F800000){
+  if((uf & 0x7F800000) == 0x7F800000){
     return uf;
   }
   int original_uf = uf;
